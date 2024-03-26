@@ -5,8 +5,8 @@
 
 #define Max(a, b) ((a) > (b) ? (a) : (b))
 
-#define L 500
-#define ITMAX 20
+#define L 400
+#define ITMAX 50
 
 int i, j, k, it;
 double eps;

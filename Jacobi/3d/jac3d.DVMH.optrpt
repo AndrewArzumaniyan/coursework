@@ -1,0 +1,265 @@
+Global optimization report for : main
+
+LOOP BEGIN at jac3d.DVMH.c (72, 5)
+    remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+LOOP END
+=================================================================
+
+Global optimization report for : loop_jac3d_29_host
+=================================================================
+
+Global optimization report for : loop_jac3d_52_host
+=================================================================
+
+Global optimization report for : loop_jac3d_64_host
+=================================================================
+
+Global optimization report for : initCdvmhGlobals_jac3d_1734068796
+=================================================================
+
+Global optimization report for : finishCdvmhGlobals_jac3d_1936981895
+=================================================================
+
+Global optimization report for : loop_jac3d_29_host.extracted
+
+LOOP BEGIN at jac3d.DVMH.c (199, 9)
+
+    LOOP BEGIN at jac3d.DVMH.c (199, 9)
+        remark: OpenMP: Worksharing loop
+
+        LOOP BEGIN at jac3d.DVMH.c (202, 13)
+
+            LOOP BEGIN at jac3d.DVMH.c (203, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+            LOOP END
+
+            LOOP BEGIN at jac3d.DVMH.c (203, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+            LOOP END
+
+            LOOP BEGIN at jac3d.DVMH.c (203, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+            LOOP END
+        LOOP END
+
+        LOOP BEGIN at jac3d.DVMH.c (202, 13)
+
+            LOOP BEGIN at jac3d.DVMH.c (203, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+            LOOP END
+        LOOP END
+    LOOP END
+LOOP END
+=================================================================
+
+Global optimization report for : loop_jac3d_52_host.extracted
+
+LOOP BEGIN at jac3d.DVMH.c (239, 9)
+
+    LOOP BEGIN at jac3d.DVMH.c (239, 9)
+        remark: OpenMP: Worksharing loop
+
+        LOOP BEGIN at jac3d.DVMH.c (242, 13)
+
+            LOOP BEGIN at jac3d.DVMH.c (243, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+            LOOP END
+        LOOP END
+    LOOP END
+LOOP END
+=================================================================
+
+Global optimization report for : loop_jac3d_64_host.extracted
+
+LOOP BEGIN at jac3d.DVMH.c (277, 9)
+
+    LOOP BEGIN at jac3d.DVMH.c (277, 9)
+        remark: OpenMP: Worksharing loop
+
+        LOOP BEGIN at jac3d.DVMH.c (280, 13)
+
+            LOOP BEGIN at jac3d.DVMH.c (281, 17)
+                remark #15521: Loop was not vectorized: loop control variable was not identified. Explicitly compute the iteration count before executing the loop or try using canonical loop form from OpenMP specification
+                remark #25583: Number of Array Refs Scalar Replaced In Loop: 1
+            LOOP END
+        LOOP END
+    LOOP END
+LOOP END
+=================================================================
+
+---- Begin Inlining Report ----
+Option Values:
+  inline-threshold: 225
+  inlinehint-threshold: 325
+  inlinecold-threshold: 45
+  inlineoptsize-threshold: 15
+
+DEAD STATIC FUNC: llvm.directive.region.entry
+
+DEAD STATIC FUNC: llvm.directive.region.exit
+
+COMPILE FUNC: main
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (38,5)
+   -> EXTERN: dvmh_init_C jac3d.DVMH.c (40,5)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (46,9)
+   -> EXTERN: dvmh_region_create_C jac3d.DVMH.c (47,30)
+   -> EXTERN: dvmh_region_register_array_C jac3d.DVMH.c (49,9)
+   -> EXTERN: dvmh_region_register_array_C jac3d.DVMH.c (50,9)
+   -> EXTERN: dvmh_region_execute_on_targets_C jac3d.DVMH.c (51,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (54,5)
+   -> EXTERN: dvmh_loop_create_C jac3d.DVMH.c (55,20)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (56,41)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (56,75)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (56,109)
+   -> EXTERN: dvmh_loop_map_C jac3d.DVMH.c (56,9)
+   -> EXTERN: dvmh_loop_set_cuda_block_C jac3d.DVMH.c (57,9)
+   -> EXTERN: dvmh_handler_func_C jac3d.DVMH.c (58,78)
+   -> EXTERN: dvmh_loop_register_handler_C jac3d.DVMH.c (58,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (60,9)
+   -> EXTERN: dvmh_loop_perform_C jac3d.DVMH.c (61,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (65,9)
+   -> EXTERN: dvmh_region_end_C jac3d.DVMH.c (66,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (70,9)
+   -> EXTERN: dvmh_seq_interval_start_C jac3d.DVMH.c (71,5)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (75,9)
+   -> EXTERN: dvmh_actual_variable2_ jac3d.DVMH.c (76,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (80,13)
+   -> EXTERN: dvmh_region_create_C jac3d.DVMH.c (81,34)
+   -> EXTERN: dvmh_region_register_array_C jac3d.DVMH.c (83,13)
+   -> EXTERN: dvmh_region_register_array_C jac3d.DVMH.c (84,13)
+   -> EXTERN: dvmh_region_execute_on_targets_C jac3d.DVMH.c (85,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (89,9)
+   -> EXTERN: dvmh_loop_create_C jac3d.DVMH.c (90,24)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (91,45)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (91,79)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (91,113)
+   -> EXTERN: dvmh_loop_map_C jac3d.DVMH.c (91,13)
+   -> EXTERN: dvmh_loop_reduction_C jac3d.DVMH.c (92,13)
+   -> EXTERN: dvmh_loop_set_cuda_block_C jac3d.DVMH.c (93,13)
+   -> EXTERN: dvmh_handler_func_C jac3d.DVMH.c (94,82)
+   -> EXTERN: dvmh_loop_register_handler_C jac3d.DVMH.c (94,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (96,13)
+   -> EXTERN: dvmh_loop_perform_C jac3d.DVMH.c (97,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (103,9)
+   -> EXTERN: dvmh_shadow_renew_C jac3d.DVMH.c (104,13)
+   -> EXTERN: dvmh_loop_create_C jac3d.DVMH.c (105,24)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (106,45)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (106,79)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (106,113)
+   -> EXTERN: dvmh_loop_map_C jac3d.DVMH.c (106,13)
+   -> EXTERN: dvmh_loop_set_cuda_block_C jac3d.DVMH.c (107,13)
+   -> EXTERN: dvmh_handler_func_C jac3d.DVMH.c (108,82)
+   -> EXTERN: dvmh_loop_register_handler_C jac3d.DVMH.c (108,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (110,13)
+   -> EXTERN: dvmh_loop_perform_C jac3d.DVMH.c (111,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (115,13)
+   -> EXTERN: dvmh_region_end_C jac3d.DVMH.c (116,13)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (119,9)
+   -> EXTERN: dvmh_get_actual_variable2_ jac3d.DVMH.c (120,9)
+   -> EXTERN: dvmh_void_printf jac3d.DVMH.c (122,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (126,5)
+   -> EXTERN: dvmh_sp_interval_end_ jac3d.DVMH.c (127,5)
+   -> EXTERN: dvmh_fopen jac3d.DVMH.c (130,9)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (131,5)
+   -> EXTERN: dvmh_get_actual_array2_ jac3d.DVMH.c (132,5)
+   -> EXTERN: dvmh_void_fwrite_distrib jac3d.DVMH.c (134,5)
+   -> EXTERN: dvmh_fclose jac3d.DVMH.c (135,5)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (137,5)
+   -> EXTERN: dvmh_exit_C jac3d.DVMH.c (138,5)
+   -> EXTERN: dvmh_exit_C jac3d.DVMH.c (139,5)
+
+COMPILE FUNC: loop_jac3d_29_host
+   -> EXTERN: dvmh_loop_get_device_num_C jac3d.DVMH.c (179,26)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (181,104)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (182,104)
+   -> EXTERN: dvmh_loop_fill_bounds_C jac3d.DVMH.c (191,5)
+   -> EXTERN: dvmh_loop_get_slot_count_C jac3d.DVMH.c (192,17)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (195,5)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (199,9)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (199,9)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (195,5)
+   -> EXTERN: __kmpc_global_thread_num jac3d.DVMH.c
+   -> EXTERN: __kmpc_push_num_threads jac3d.DVMH.c
+   -> EXTERN: __kmpc_fork_call jac3d.DVMH.c (195,5)
+
+COMPILE FUNC: loop_jac3d_52_host
+   -> EXTERN: dvmh_loop_get_device_num_C jac3d.DVMH.c (217,26)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (219,104)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (220,104)
+   -> EXTERN: dvmh_loop_fill_bounds_C jac3d.DVMH.c (230,5)
+   -> EXTERN: dvmh_loop_get_slot_count_C jac3d.DVMH.c (231,17)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (234,5)
+   -> DELETE: dvmh_loop_red_init_C jac3d.DVMH.c (237,9)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (239,9)
+   -> DELETE: llvm.fabs.f64 jac3d.DVMH.c (245,34)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (239,9)
+   -> DELETE: dvmh_loop_red_post_C jac3d.DVMH.c (249,9)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (234,5)
+   -> EXTERN: __kmpc_global_thread_num jac3d.DVMH.c
+   -> EXTERN: __kmpc_push_num_threads jac3d.DVMH.c
+   -> EXTERN: __kmpc_fork_call jac3d.DVMH.c (234,5)
+
+COMPILE FUNC: loop_jac3d_64_host
+   -> EXTERN: dvmh_loop_get_device_num_C jac3d.DVMH.c (257,26)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (259,104)
+   -> EXTERN: dvmh_get_natural_base_C jac3d.DVMH.c (260,104)
+   -> EXTERN: dvmh_loop_fill_bounds_C jac3d.DVMH.c (269,5)
+   -> EXTERN: dvmh_loop_get_slot_count_C jac3d.DVMH.c (270,17)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (273,5)
+   -> DELETE: llvm.directive.region.entry jac3d.DVMH.c (277,9)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (277,9)
+   -> DELETE: llvm.directive.region.exit jac3d.DVMH.c (273,5)
+   -> EXTERN: __kmpc_global_thread_num jac3d.DVMH.c
+   -> EXTERN: __kmpc_push_num_threads jac3d.DVMH.c
+   -> EXTERN: __kmpc_fork_call jac3d.DVMH.c (273,5)
+
+COMPILE FUNC: initCdvmhGlobals_jac3d_1734068796
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (144,5)
+   -> EXTERN: dvmh_array_create_C jac3d.DVMH.c (145,5)
+   -> EXTERN: dvmh_distribution_block_C jac3d.DVMH.c (146,29)
+   -> EXTERN: dvmh_distribution_block_C jac3d.DVMH.c (146,59)
+   -> EXTERN: dvmh_distribution_block_C jac3d.DVMH.c (146,89)
+   -> EXTERN: dvmh_distribute_C jac3d.DVMH.c (146,5)
+   -> EXTERN: dvmh_line_C jac3d.DVMH.c (148,5)
+   -> EXTERN: dvmh_array_create_C jac3d.DVMH.c (149,5)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (150,27)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (150,61)
+   -> EXTERN: dvmh_alignment_linear_C jac3d.DVMH.c (150,95)
+   -> EXTERN: dvmh_align_C jac3d.DVMH.c (150,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (152,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (153,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (154,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (155,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (156,5)
+   -> EXTERN: dvmh_data_enter_C jac3d.DVMH.c (157,5)
+
+COMPILE FUNC: finishCdvmhGlobals_jac3d_1936981895
+   -> EXTERN: dvmh_delete_object_ jac3d.DVMH.c (161,5)
+   -> EXTERN: dvmh_delete_object_ jac3d.DVMH.c (162,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (163,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (164,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (165,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (166,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (167,5)
+   -> EXTERN: dvmh_data_exit_C jac3d.DVMH.c (168,5)
+
+COMPILE FUNC: loop_jac3d_64_host.extracted
+   -> EXTERN: __kmpc_dispatch_init_4 jac3d.DVMH.c
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+
+COMPILE FUNC: loop_jac3d_52_host.extracted
+   -> EXTERN: __kmpc_dispatch_init_4 jac3d.DVMH.c
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+   -> EXTERN: dvmh_loop_red_init_C jac3d.DVMH.c (237,9)
+   -> llvm.fabs.f64 jac3d.DVMH.c (245,34)
+   -> EXTERN: dvmh_loop_red_post_C jac3d.DVMH.c (249,9)
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+   -> llvm.maxnum.f64 jac3d.DVMH.c (246,28)
+
+COMPILE FUNC: loop_jac3d_29_host.extracted
+   -> EXTERN: __kmpc_dispatch_init_4 jac3d.DVMH.c
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+   -> EXTERN: __kmpc_dispatch_next_4 jac3d.DVMH.c
+
+---- End Inlining Report ------
