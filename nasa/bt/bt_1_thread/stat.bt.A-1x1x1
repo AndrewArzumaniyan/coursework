@@ -1,0 +1,42 @@
+Processor system=1*1*1
+Statistics has been accumulated on DVM-system version 5.0, platform DVM
+Analyzer is executing on DVM-system version 5.0, platform DVM
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=94 SOURCE=bt.all.c ) LEVEL=0  EXE_COUNT=1
+--- The main characteristics --- 
+Parallelization efficiency      1.0000 
+Execution time                 57.9200 
+Processors                           1
+Threads amount                       1
+Total time                     57.9200
+Productive time                57.9200 ( CPU= 57.8913 Sys= 0.0286 I/O= 0.0000 )
+Overlap                         0.0002
+                  Nop    Overlap 
+Shadow           1414     0.0002 
+Redistribution    404     0.0000 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Overlap                     0.0002     1     0.0002     1     0.0002 
+Execution time             57.9200     1    57.9200     1    57.9200 
+User CPU time              57.8913     1    57.8913     1    57.8913 
+Sys. CPU time               0.0286     1     0.0286     1     0.0286 
+Processors                       1     1          1     1          1 
+                       Overlap  
+Shadow          Tmin    0.0002     1 
+Shadow          Tmax    0.0002     1 
+Shadow          Tmid    0.0002       
+--- The execution characteristics --- 
+                                1 
+Overlap                    0.0002 
+Execution time            57.9200 
+User CPU time             57.8913 
+Sys. CPU time              0.0286 
+Processors                      1 
+           Overlap                
+Shadow                     0.0002 
+
+
+-------------------------------------------------------------------------
+Name (number) and performance time of processors
+DVM(1) 0.541641
+min - DVM(1) 0.541641; max - DVM(1) 0.541641; mid - 0.541641
