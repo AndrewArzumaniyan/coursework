@@ -1,0 +1,75 @@
+Processor system=1*3*2
+Statistics has been accumulated on DVM-system version 5.0, platform DVM
+Analyzer is executing on DVM-system version 5.0, platform DVM
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=102 SOURCE=ep.c ) LEVEL=0  EXE_COUNT=1
+--- The main characteristics --- 
+Parallelization efficiency      0.1667 
+Execution time                 23.3799 
+Processors                           6
+Threads amount                       6
+Total time                    140.2796
+Productive time                23.3778 ( CPU= 23.3777 Sys= 0.0001 I/O= 0.0000 )
+Lost  time                    116.9018 
+   Insufficient parallelism   116.8889 ( User= 116.8885 Sys= 0.0005 )
+   Communication                0.0094 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0034
+Load imbalance                  0.0014
+Synchronization                 0.0000
+Time variation                  0.0000
+Overlap                         0.0000
+                  Nop   Communic    Synchro  Variation    Overlap 
+Reduction           1     0.0094     0.0000     0.0000     0.0000 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                  19.4834     1    19.4838     5    19.4836 
+User insufficient par.     19.4806     5    19.4825     1    19.4814 
+Sys.insufficient par.       0.0001     6     0.0001     1     0.0001 
+Idle time                   0.0000     3     0.0007     4     0.0006 
+Communication               0.0001     1     0.0025     5     0.0016 
+Synchronization             0.0000     5     0.0000     6     0.0000 
+Variation                   0.0000     1     0.0000     6     0.0000 
+Overlap                     0.0000     1     0.0000     5     0.0000 
+Load imbalance              0.0000     1     0.0004     5     0.0002 
+Execution time             23.3792     4    23.3799     3    23.3794 
+User CPU time               3.8961     5     3.8965     1     3.8963 
+Sys. CPU time               0.0000     6     0.0000     1     0.0000 
+Processors                       6     1          6     6          6 
+                      Communic          Synchro        Variation          Overlap  
+Reduction       Tmin    0.0001     1     0.0000     5     0.0000     1     0.0000     1 
+Reduction       Tmax    0.0025     5     0.0000     6     0.0000     6     0.0000     5 
+Reduction       Tmid    0.0016           0.0000           0.0000           0.0000       
+--- The execution characteristics --- 
+                                1          2          3          4          5          6 
+Lost time                 19.4834    19.4837    19.4835    19.4836    19.4838    19.4838 
+User insufficient par.    19.4825    19.4811    19.4818    19.4817    19.4806    19.4807 
+Sys.insufficient par.      0.0001     0.0001     0.0001     0.0001     0.0001     0.0001 
+Idle time                  0.0007     0.0007     0.0000     0.0007     0.0007     0.0007 
+Communication              0.0001     0.0018     0.0016     0.0011     0.0025     0.0023 
+Synchronization            0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+Variation                  0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+Overlap                    0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+Load imbalance             0.0000     0.0003     0.0001     0.0002     0.0004     0.0004 
+Execution time            23.3792    23.3792    23.3799    23.3792    23.3792    23.3792 
+User CPU time              3.8965     3.8962     3.8964     3.8963     3.8961     3.8961 
+Sys. CPU time              0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+Processors                      6          6          6          6          6          6 
+           Communication          
+Reduction                  0.0001     0.0018     0.0016     0.0011     0.0025     0.0023 
+           Synchronization        
+Reduction                  0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+           Variation              
+Reduction                  0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0000     0.0000     0.0000     0.0000 
+
+
+-------------------------------------------------------------------------
+Name (number) and performance time of processors
+DVM(1) 0.517609
+DVM(2) 0.517491
+DVM(3) 0.517498
+DVM(4) 0.519111
+DVM(5) 0.517507
+DVM(6) 0.517559
+min - DVM(2) 0.517491; max - DVM(4) 0.519111; mid - 0.517796
