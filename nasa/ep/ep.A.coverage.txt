@@ -1,0 +1,882 @@
+/home/dvmuser3/andrey/npb-3.3-c/EP/ep.c:
+    1|       |//-------------------------------------------------------------------------//
+    2|       |//                                                                         //
+    3|       |//  This benchmark is a serial C version of the NPB EP code. This C        //
+    4|       |//  version is developed by the Center for Manycore Programming at Seoul   //
+    5|       |//  National University and derived from the serial Fortran versions in    //
+    6|       |//  "NPB3.3-SER" developed by NAS.                                         //
+    7|       |//                                                                         //
+    8|       |//  Permission to use, copy, distribute and modify this software for any   //
+    9|       |//  purpose with or without fee is hereby granted. This software is        //
+   10|       |//  provided "as is" without express or implied warranty.                  //
+   11|       |//                                                                         //
+   12|       |//  Information on NPB 3.3, including the technical report, the original   //
+   13|       |//  specifications, source code, results and information on how to submit  //
+   14|       |//  new results, is available at:                                          //
+   15|       |//                                                                         //
+   16|       |//           http://www.nas.nasa.gov/Software/NPB/                         //
+   17|       |//                                                                         //
+   18|       |//  Send comments or suggestions for this C version to cmp@aces.snu.ac.kr  //
+   19|       |//                                                                         //
+   20|       |//          Center for Manycore Programming                                //
+   21|       |//          School of Computer Science and Engineering                     //
+   22|       |//          Seoul National University                                      //
+   23|       |//          Seoul 151-744, Korea                                           //
+   24|       |//                                                                         //
+   25|       |//          E-mail:  cmp@aces.snu.ac.kr                                    //
+   26|       |//                                                                         //
+   27|       |//-------------------------------------------------------------------------//
+   28|       |
+   29|       |//-------------------------------------------------------------------------//
+   30|       |// Authors: Sangmin Seo, Jungwon Kim, Jun Lee, Jeongho Nah, Gangwon Jo,    //
+   31|       |//          and Jaejin Lee                                                 //
+   32|       |//-------------------------------------------------------------------------//
+   33|       |
+   34|       |//--------------------------------------------------------------------
+   35|       |//      program EMBAR
+   36|       |//--------------------------------------------------------------------
+   37|       |//  This is the serial version of the APP Benchmark 1,
+   38|       |//  the "embarassingly parallel" benchmark.
+   39|       |//
+   40|       |//
+   41|       |//  M is the Log_2 of the number of complex pairs of uniform (0, 1) random
+   42|       |//  numbers.  MK is the Log_2 of the size of each batch of uniform random
+   43|       |//  numbers.  MK can be set for convenience on a given system, since it does
+   44|       |//  not affect the results.
+   45|       |//--------------------------------------------------------------------
+   46|       |
+   47|       |#define _CRT_SECURE_NO_DEPRECATE
+   48|       |#include <math.h>
+   49|       |#include <stdio.h>
+   50|       |#include <stdlib.h>
+   51|       |
+   52|       |#undef max
+   53|       |#undef min
+   54|       |
+   55|       |#include "npbparams.h"
+   56|       |#include "type.h"
+   57|       |#include "print_results.h"
+   58|       |#include "randdp.h"
+   59|       |#include "timers.h"
+   60|       |
+   61|       |#include <time.h>
+   62|       |#ifndef DOS
+   63|       |#ifndef _WIN32
+   64|       |#include <sys/time.h>
+   65|       |#else
+   66|       |#include <sys/timeb.h>
+   67|       |#endif
+   68|       |#endif
+   69|       |
+   70|   210M|#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
+   71|       |
+   72|       |#if 0
+   73|       |// For TSAR.
+   74|       |enum { MK = 16, MM = (M - MK), NN = (1 << MM), NK = (1 << MK), NQ = 10 };
+   75|       |#else
+   76|       |// For CDVMH.
+   77|   268M|# define MK 16
+   78|      1|# define MM (M - MK)
+   79|      1|# define NN (1 << MM)
+   80|   268M|# define NK (1 << MK)
+   81|     11|# define NQ 10
+   82|       |#endif
+   83|       |
+   84|       |const double EPSILON = 1.0e-8;
+   85|       |const double A = 1220703125.0;
+   86|       |const double S = 271828183.0;
+   87|       |
+   88|       |static double x[2 * NK];
+   89|       |static double q[NQ];
+   90|       |
+   91|       |static double q0;
+   92|       |static double q1;
+   93|       |static double q2;
+   94|       |static double q3;
+   95|       |static double q4;
+   96|       |static double q5;
+   97|       |static double q6;
+   98|       |static double q7;
+   99|       |static double q8;
+  100|       |static double q9;
+  101|       |
+  102|      1|int main() {
+  103|      1|  double Mops, t1, t2, t3, t4, x1, x2;
+  104|      1|  double sx, sy, tm, an, tt, gc;
+  105|      1|  double sx_verify_value, sy_verify_value, sx_err, sy_err;
+  106|      1|  int np;
+  107|      1|  int i, ik, kk, l, k, nit;
+  108|      1|  int k_offset, j;
+  109|      1|  logical verified, timers_enabled;
+  110|       |
+  111|      1|  double dum[3] = {1.0, 1.0, 1.0};
+  112|      1|  char size[16];
+  113|       |
+  114|      1|  FILE *fp;
+  115|       |
+  116|      1|#pragma dvm template[NN] distribute[block]
+  117|      1|  void *dvm_tpl;
+  118|       |
+  119|      1|#pragma dvm template[NQ] distribute[block]
+  120|      1|  void *dvm_tpl_1;
+  121|       |
+  122|      1|  if ((fp = fopen("timer.flag", "r")) == NULL) {
+  123|      1|    timers_enabled = false;
+  124|      1|  } else {
+  125|      0|    timers_enabled = true;
+  126|      0|    fclose(fp);
+  127|      0|  }
+  128|       |
+  129|       |  //--------------------------------------------------------------------
+  130|       |  //  Because the size of the problem is too large to store in a 32-bit
+  131|       |  //  integer for some classes, we put it into a string (for printing).
+  132|       |  //  Have to strip off the decimal point put in there by the floating
+  133|       |  //  point print statement (internal file)
+  134|       |  //--------------------------------------------------------------------
+  135|       |
+  136|      1|  sprintf(size, "%15.0lf", pow(2.0, M + 1));
+  137|      1|  j = 14;
+  138|      1|  if (size[j] == '.')
+  139|      0|    j--;
+  140|      1|  size[j + 1] = '\0';
+  141|      1|  printf("\n\n NAS Parallel Benchmarks (NPB3.3-SER-C) - EP Benchmark\n");
+  142|      1|  printf("\n Number of random numbers generated: %15s\n", size);
+  143|       |
+  144|      1|  verified = false;
+  145|       |
+  146|       |  //--------------------------------------------------------------------
+  147|       |  //  Compute the number of "batches" of random number pairs generated
+  148|       |  //  per processor. Adjust if the number of processors does not evenly
+  149|       |  //  divide the total number
+  150|       |  //--------------------------------------------------------------------
+  151|       |
+  152|      1|  np = NN;
+  153|       |
+  154|       |  //--------------------------------------------------------------------
+  155|       |  //  Call the random number generator functions and initialize
+  156|       |  //  the x-array to reduce the effects of paging on the timings.
+  157|       |  //  Also, call all mathematical functions that are used. Make
+  158|       |  //  sure these initializations cannot be eliminated as dead code.
+  159|       |  //--------------------------------------------------------------------
+  160|       |
+  161|      1|  vranlc(0, &dum[0], dum[1], &dum[2]);
+  162|      1|  dum[0] = randlc(&dum[1], dum[2]);
+  163|   131k|  for (i = 0; i < 2 * NK; i++) {
+  164|   131k|    x[i] = -1.0e99;
+  165|   131k|  }
+  166|      1|  Mops = log(sqrt(fabs(MAX(1.0, 1.0))));
+  167|       |
+  168|      1|  timer_clear(0);
+  169|      1|  timer_clear(1);
+  170|      1|  timer_clear(2);
+  171|      1|  timer_start(0);
+  172|       |
+  173|      1|  t1 = A;
+  174|      1|  vranlc(0, &t1, A, x);
+  175|       |
+  176|       |  //--------------------------------------------------------------------
+  177|       |  //  Compute AN = A ^ (2 * NK) (mod 2^46).
+  178|       |  //--------------------------------------------------------------------
+  179|       |
+  180|      1|  t1 = A;
+  181|       |
+  182|     18|  for (i = 0; i < MK + 1; i++) {
+  183|     17|    t2 = randlc(&t1, t1);
+  184|     17|  }
+  185|       |
+  186|      1|  an = t1;
+  187|      1|  tt = S;
+  188|      1|  gc = 0.0;
+  189|      1|  sx = 0.0;
+  190|      1|  sy = 0.0;
+  191|       |
+  192|      1|  k_offset = -1;
+  193|       |
+  194|      1|  q0 = 0.0;
+  195|      1|  q1 = 0.0;
+  196|      1|  q2 = 0.0;
+  197|      1|  q3 = 0.0;
+  198|      1|  q4 = 0.0;
+  199|      1|  q5 = 0.0;
+  200|      1|  q6 = 0.0;
+  201|      1|  q7 = 0.0;
+  202|      1|  q8 = 0.0;
+  203|      1|  q9 = 0.0;
+  204|       |
+  205|      1|#pragma dvm region
+  206|      1|  {
+  207|       |    //--------------------------------------------------------------------
+  208|       |    //  Each instance of this loop may be performed independently. We compute
+  209|       |    //  the k offsets separately to take into account the fact that some nodes
+  210|       |    //  have more numbers to generate than others
+  211|       |    //--------------------------------------------------------------------
+  212|       |
+  213|      1|#pragma dvm parallel([k] on dvm_tpl[k - 1]) reduction(                         \
+  214|      1|    sum(sx), sum(sy), sum(q0), sum(q1), sum(q2), sum(q3), sum(q4), sum(q5),    \
+  215|      1|    sum(q6), sum(q7), sum(q8), sum(q9)) private(i, ik, kk, l, t1, t2, t3, t4, x1, x2, x)
+  216|  4.09k|    for (k = 1; k <= np; k++) {
+  217|  4.09k|      kk = k_offset + k;
+  218|  4.09k|      t1 = S;
+  219|  4.09k|      t2 = an;
+  220|       |
+  221|       |      // Find starting seed t1 for this kk.
+  222|  4.09k|      {
+  223|  45.0k|        for (i = 1; i <= 100; i++) {
+  224|  45.0k|          ik = kk / 2;
+  225|  45.0k|          if ((2 * ik) != kk)
+  226|       |          /* randlc(&t1, t2) is inlined below */
+  227|  24.5k|          {
+  228|  24.5k|            double R0;
+  229|  24.5k|#pragma spf assert nomacro
+  230|  24.5k|            {
+  231|  24.5k|              double *x0 = &t1;
+  232|  24.5k|              double a0 = t2;
+  233|       |              //--------------------------------------------------------------------
+  234|       |              //
+  235|       |              //  This routine returns a uniform pseudorandom double precision
+  236|       |              //  number in the range (0, 1) by using the linear congruential
+  237|       |              //  generator
+  238|       |              //
+  239|       |              //  x_{k+1} = a x_k  (mod 2^46)
+  240|       |              //
+  241|       |              //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates
+  242|       |              //  2^44 numbers before repeating.  The argument A is the same as
+  243|       |              //  'a' in the above formula, and X is the same as x_0.  A and X
+  244|       |              //  must be odd double precision integers in the range (1, 2^46).
+  245|       |              //  The returned value RANDLC is normalized to be between 0 and 1,
+  246|       |              //  i.e. RANDLC = 2^(-46) * x_1.  X is updated to contain the new
+  247|       |              //  seed x_1, so that subsequent calls to RANDLC using the same
+  248|       |              //  arguments will generate a continuous sequence.
+  249|       |              //
+  250|       |              //  This routine should produce the same results on any computer
+  251|       |              //  with at least 48 mantissa bits in double precision floating
+  252|       |              //  point data.  On 64 bit systems, double precision should be
+  253|       |              //  disabled.
+  254|       |              //
+  255|       |              //  David H. Bailey     October 26, 1990
+  256|       |              //
+  257|       |              //--------------------------------------------------------------------
+  258|       |
+  259|       |              // r23 = pow(0.5, 23.0);
+  260|       |              ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+  261|       |              // r46 = r23 * r23;
+  262|       |              // t23 = pow(2.0, 23.0);
+  263|       |              ////  pow(2.0, 23.0) = 8.388608e+06
+  264|       |              // t46 = t23 * t23;
+  265|       |
+  266|  24.5k|              const double r23 = 1.1920928955078125e-07;
+  267|  24.5k|              const double r46 = r23 * r23;
+  268|  24.5k|              const double t23 = 8.388608e+06;
+  269|  24.5k|              const double t46 = t23 * t23;
+  270|       |
+  271|  24.5k|              double t1, t2, t3, t4, a1, a2, x1, x2, z;
+  272|  24.5k|              double r;
+  273|       |
+  274|       |              //--------------------------------------------------------------------
+  275|       |              //  Break A into two parts such that A = 2^23 * A1 + A2.
+  276|       |              //--------------------------------------------------------------------
+  277|  24.5k|              t1 = r23 * a0;
+  278|  24.5k|              a1 = (int)t1;
+  279|  24.5k|              a2 = a0 - t23 * a1;
+  280|       |
+  281|       |              //--------------------------------------------------------------------
+  282|       |              //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  283|       |              //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  284|       |              //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  285|       |              //--------------------------------------------------------------------
+  286|  24.5k|              t1 = r23 * (*x0);
+  287|  24.5k|              x1 = (int)t1;
+  288|  24.5k|              x2 = *x0 - t23 * x1;
+  289|  24.5k|              t1 = a1 * x2 + a2 * x1;
+  290|  24.5k|              t2 = (int)(r23 * t1);
+  291|  24.5k|              z = t1 - t23 * t2;
+  292|  24.5k|              t3 = t23 * z + a2 * x2;
+  293|  24.5k|              t4 = (int)(r46 * t3);
+  294|  24.5k|              *x0 = t3 - t46 * t4;
+  295|  24.5k|              r = r46 * (*x0);
+  296|       |
+  297|  24.5k|              R0 = r;
+  298|  24.5k|            }
+  299|  24.5k|            t3 = R0;
+  300|  24.5k|          }
+  301|  45.0k|          if (ik == 0)
+  302|  4.09k|            break;
+  303|       |          /* randlc(&t2, t2) is inlined below */
+  304|  40.9k|          double R1;
+  305|  40.9k|#pragma spf assert nomacro
+  306|  40.9k|          {
+  307|  40.9k|            double *x3 = &t2;
+  308|  40.9k|            double a3 = t2;
+  309|       |            //--------------------------------------------------------------------
+  310|       |            //
+  311|       |            //  This routine returns a uniform pseudorandom double precision
+  312|       |            //  number in the range (0, 1) by using the linear congruential
+  313|       |            //  generator
+  314|       |            //
+  315|       |            //  x_{k+1} = a x_k  (mod 2^46)
+  316|       |            //
+  317|       |            //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates
+  318|       |            //  2^44 numbers before repeating.  The argument A is the same as
+  319|       |            //  'a' in the above formula, and X is the same as x_0.  A and X
+  320|       |            //  must be odd double precision integers in the range (1, 2^46).
+  321|       |            //  The returned value RANDLC is normalized to be between 0 and 1,
+  322|       |            //  i.e. RANDLC = 2^(-46) * x_1.  X is updated to contain the new
+  323|       |            //  seed x_1, so that subsequent calls to RANDLC using the same
+  324|       |            //  arguments will generate a continuous sequence.
+  325|       |            //
+  326|       |            //  This routine should produce the same results on any computer
+  327|       |            //  with at least 48 mantissa bits in double precision floating
+  328|       |            //  point data. On 64 bit systems, double precision should be
+  329|       |            //  disabled.
+  330|       |            //
+  331|       |            //  David H. Bailey     October 26, 1990
+  332|       |            //
+  333|       |            //--------------------------------------------------------------------
+  334|       |
+  335|       |            // r23 = pow(0.5, 23.0);
+  336|       |            ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+  337|       |            // r46 = r23 * r23;
+  338|       |            // t23 = pow(2.0, 23.0);
+  339|       |            ////  pow(2.0, 23.0) = 8.388608e+06
+  340|       |            // t46 = t23 * t23;
+  341|       |
+  342|  40.9k|            const double r23 = 1.1920928955078125e-07;
+  343|  40.9k|            const double r46 = r23 * r23;
+  344|  40.9k|            const double t23 = 8.388608e+06;
+  345|  40.9k|            const double t46 = t23 * t23;
+  346|       |
+  347|  40.9k|            double t1, t2, t3, t4, a1, a2, x1, x2, z;
+  348|  40.9k|            double r;
+  349|       |
+  350|       |            //--------------------------------------------------------------------
+  351|       |            //  Break A into two parts such that A = 2^23 * A1 + A2.
+  352|       |            //--------------------------------------------------------------------
+  353|  40.9k|            t1 = r23 * a3;
+  354|  40.9k|            a1 = (int)t1;
+  355|  40.9k|            a2 = a3 - t23 * a1;
+  356|       |
+  357|       |            //--------------------------------------------------------------------
+  358|       |            //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  359|       |            //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  360|       |            //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  361|       |            //--------------------------------------------------------------------
+  362|  40.9k|            t1 = r23 * (*x3);
+  363|  40.9k|            x1 = (int)t1;
+  364|  40.9k|            x2 = *x3 - t23 * x1;
+  365|  40.9k|            t1 = a1 * x2 + a2 * x1;
+  366|  40.9k|            t2 = (int)(r23 * t1);
+  367|  40.9k|            z = t1 - t23 * t2;
+  368|  40.9k|            t3 = t23 * z + a2 * x2;
+  369|  40.9k|            t4 = (int)(r46 * t3);
+  370|  40.9k|            *x3 = t3 - t46 * t4;
+  371|  40.9k|            r = r46 * (*x3);
+  372|       |
+  373|  40.9k|            R1 = r;
+  374|  40.9k|          }
+  375|  40.9k|          t3 = R1;
+  376|  40.9k|          kk = ik;
+  377|  40.9k|        }
+  378|  4.09k|      }
+  379|       |      //--------------------------------------------------------------------
+  380|       |      //  Compute uniform pseudorandom numbers.
+  381|       |      //--------------------------------------------------------------------
+  382|       |      //    if (timers_enabled)
+  383|       |      //      timer_start(2);
+  384|       |
+  385|       |      /* vranlc(2 * NK, &t1, A, x) is inlined below */
+  386|  4.09k|        int n0 = 2 * NK;
+  387|  4.09k|        double *x4 = &t1;
+  388|  4.09k|        double a4 = A;
+  389|       |
+  390|       |        //--------------------------------------------------------------------
+  391|       |        //
+  392|       |        //  This routine generates N uniform pseudorandom double precision
+  393|       |        //  numbers in the range (0, 1) by using the linear congruential
+  394|       |        //  generator
+  395|       |        //
+  396|       |        //  x_{k+1} = a x_k  (mod 2^46)
+  397|       |        //
+  398|       |        //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44
+  399|       |        //  numbers before repeating.  The argument A is the same as 'a' in the
+  400|       |        //  above formula, and X is the same as x_0.  A and X must be odd double
+  401|       |        //  precision integers in the range (1, 2^46).  The N results are placed
+  402|       |        //  in Y and are normalized to be between 0 and 1.  X is updated to
+  403|       |        //  contain the new seed, so that subsequent calls to VRANLC using the
+  404|       |        //  same arguments will generate a continuous sequence.  If N is zero,
+  405|       |        //  only initialization is performed, and the variables X, A and Y are
+  406|       |        //  ignored.
+  407|       |        //
+  408|       |        //  This routine is the standard version designed for scalar or RISC
+  409|       |        //  systems. However, it should produce the same results on any single
+  410|       |        //  processor computer with at least 48 mantissa bits in double
+  411|       |        //  precision floating point data.  On 64 bit systems, double precision
+  412|       |        //  should be disabled.
+  413|       |        //
+  414|       |        //--------------------------------------------------------------------
+  415|       |
+  416|       |        // r23 = pow(0.5, 23.0);
+  417|       |        ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+  418|       |        // r46 = r23 * r23;
+  419|       |        // t23 = pow(2.0, 23.0);
+  420|       |        ////  pow(2.0, 23.0) = 8.388608e+06
+  421|       |        // t46 = t23 * t23;
+  422|       |
+  423|  4.09k|        const double r23 = 1.1920928955078125e-07;
+  424|  4.09k|        const double r46 = r23 * r23;
+  425|  4.09k|        const double t23 = 8.388608e+06;
+  426|  4.09k|        const double t46 = t23 * t23;
+  427|       |
+  428|  4.09k|        double t1, t2, t3, t4, a1, a2, x1, x2, z;
+  429|       |
+  430|  4.09k|        int i;
+  431|       |
+  432|       |        //--------------------------------------------------------------------
+  433|       |        //  Break A into two parts such that A = 2^23 * A1 + A2.
+  434|       |        //--------------------------------------------------------------------
+  435|  4.09k|        t1 = r23 * a4;
+  436|  4.09k|        a1 = (int)t1;
+  437|  4.09k|        a2 = a4 - t23 * a1;
+  438|       |
+  439|       |        //--------------------------------------------------------------------
+  440|       |        //  Generate N results.   This loop is not vectorizable.
+  441|       |        //--------------------------------------------------------------------
+  442|       |      // if (timers_enabled)
+  443|       |      //   timer_stop(2);
+  444|       |
+  445|       |      //--------------------------------------------------------------------
+  446|       |      //  Compute Gaussian deviates by acceptance-rejection method and
+  447|       |      //  tally counts in concentri//square annuli.  This loop is not
+  448|       |      //  vectorizable.
+  449|       |      //--------------------------------------------------------------------
+  450|       |      //  if (timers_enabled)
+  451|       |      //    timer_start(1);
+  452|       |
+  453|   268M|      for (i = 0; i < NK; i++) {
+  454|   268M|        double x_2i, x_2i1;
+  455|   268M|        {
+  456|       |          //--------------------------------------------------------------------
+  457|       |          //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  458|       |          //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  459|       |          //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  460|       |          //--------------------------------------------------------------------
+  461|   268M|          t1 = r23 * (*x4);
+  462|   268M|          x1 = (int)t1;
+  463|   268M|          x2 = *x4 - t23 * x1;
+  464|   268M|          t1 = a1 * x2 + a2 * x1;
+  465|   268M|          t2 = (int)(r23 * t1);
+  466|   268M|          z = t1 - t23 * t2;
+  467|   268M|          t3 = t23 * z + a2 * x2;
+  468|   268M|          t4 = (int)(r46 * t3);
+  469|   268M|          *x4 = t3 - t46 * t4;
+  470|   268M|          x_2i = r46 * (*x4);
+  471|   268M|        }
+  472|   268M|        {
+  473|       |          //--------------------------------------------------------------------
+  474|       |          //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  475|       |          //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  476|       |          //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  477|       |          //--------------------------------------------------------------------
+  478|   268M|          t1 = r23 * (*x4);
+  479|   268M|          x1 = (int)t1;
+  480|   268M|          x2 = *x4 - t23 * x1;
+  481|   268M|          t1 = a1 * x2 + a2 * x1;
+  482|   268M|          t2 = (int)(r23 * t1);
+  483|   268M|          z = t1 - t23 * t2;
+  484|   268M|          t3 = t23 * z + a2 * x2;
+  485|   268M|          t4 = (int)(r46 * t3);
+  486|   268M|          *x4 = t3 - t46 * t4;
+  487|   268M|          x_2i1 = r46 * (*x4);
+  488|   268M|        }
+  489|   268M|        x1 = 2.0 * x_2i - 1.0;
+  490|   268M|        x2 = 2.0 * x_2i1 - 1.0;
+  491|   268M|        t1 = x1 * x1 + x2 * x2;
+  492|   268M|        if (t1 <= 1.0) {
+  493|   210M|          t2 = sqrt(-2.0 * log(t1) / t1);
+  494|   210M|          t3 = (x1 * t2);
+  495|   210M|          t4 = (x2 * t2);
+  496|   210M|          l = MAX(fabs(t3), fabs(t4));
+  497|   210M|          switch (l) {
+  498|  98.2M|            case 0: q0 = q0 + 1.0; break;
+  499|  93.8M|            case 1: q1 = q1 + 1.0; break;
+  500|  17.6M|            case 2: q2 = q2 + 1.0; break;
+  501|  1.11M|            case 3: q3 = q3 + 1.0; break;
+  502|  26.5k|            case 4: q4 = q4 + 1.0; break;
+  503|    245|            case 5: q5 = q5 + 1.0; break;
+  504|      0|            case 6: q6 = q6 + 1.0; break;
+  505|      0|            case 7: q7 = q7 + 1.0; break;
+  506|      0|            case 8: q8 = q8 + 1.0; break;
+  507|      0|            case 9: q9 = q9 + 1.0; break;
+  508|   210M|          }
+  509|   210M|          sx = sx + t3;
+  510|   210M|          sy = sy + t4;
+  511|   210M|        }
+  512|   268M|      }
+  513|       |
+  514|       |      //  if (timers_enabled)
+  515|       |      //    timer_stop(1);
+  516|  4.09k|    }
+  517|      1|    gc = gc + q0;
+  518|      1|    gc = gc + q1;
+  519|      1|    gc = gc + q2;
+  520|      1|    gc = gc + q3;
+  521|      1|    gc = gc + q4;
+  522|      1|    gc = gc + q5;
+  523|      1|    gc = gc + q6;
+  524|      1|    gc = gc + q7;
+  525|      1|    gc = gc + q8;
+  526|      1|    gc = gc + q9;
+  527|      1|  }
+  528|       |
+  529|      0|  timer_stop(0);
+  530|      1|  tm = timer_read(0);
+  531|       |
+  532|      1|  q[0] = q0;
+  533|      1|  q[1] = q1;
+  534|      1|  q[2] = q2;
+  535|      1|  q[3] = q3;
+  536|      1|  q[4] = q4;
+  537|      1|  q[5] = q5;
+  538|      1|  q[6] = q6;
+  539|      1|  q[7] = q7;
+  540|      1|  q[8] = q8;
+  541|      1|  q[9] = q9;
+  542|       |
+  543|      1|  nit = 0;
+  544|      1|  verified = true;
+  545|      1|  if (M == 24) {
+  546|      0|    sx_verify_value = -3.247834652034740e+3;
+  547|      0|    sy_verify_value = -6.958407078382297e+3;
+  548|      1|  } else if (M == 25) {
+  549|      0|    sx_verify_value = -2.863319731645753e+3;
+  550|      0|    sy_verify_value = -6.320053679109499e+3;
+  551|      1|  } else if (M == 28) {
+  552|      1|    sx_verify_value = -4.295875165629892e+3;
+  553|      1|    sy_verify_value = -1.580732573678431e+4;
+  554|      1|  } else if (M == 30) {
+  555|      0|    sx_verify_value = 4.033815542441498e+4;
+  556|      0|    sy_verify_value = -2.660669192809235e+4;
+  557|      0|  } else if (M == 32) {
+  558|      0|    sx_verify_value = 4.764367927995374e+4;
+  559|      0|    sy_verify_value = -8.084072988043731e+4;
+  560|      0|  } else if (M == 36) {
+  561|      0|    sx_verify_value = 1.982481200946593e+5;
+  562|      0|    sy_verify_value = -1.020596636361769e+5;
+  563|      0|  } else if (M == 40) {
+  564|      0|    sx_verify_value = -5.319717441530e+05;
+  565|      0|    sy_verify_value = -3.688834557731e+05;
+  566|      0|  } else {
+  567|      0|    verified = false;
+  568|      0|  }
+  569|       |
+  570|      1|  if (verified) {
+  571|      1|    sx_err = fabs((sx - sx_verify_value) / sx_verify_value);
+  572|      1|    sy_err = fabs((sy - sy_verify_value) / sy_verify_value);
+  573|      1|    verified = ((sx_err <= EPSILON) && (sy_err <= EPSILON));
+  574|      1|  }
+  575|       |
+  576|      1|  Mops = pow(2.0, M + 1) / tm / 1000000.0;
+  577|       |
+  578|      1|  printf("\nEP Benchmark Results:\n\n");
+  579|      1|  printf("CPU Time =%10.4lf\n", tm);
+  580|      1|  printf("N = 2^%5d\n", M);
+  581|      1|  printf("No. Gaussian Pairs = %15.0lf\n", gc);
+  582|      1|  printf("Sums = %25.15lE %25.15lE\n", sx, sy);
+  583|      1|  printf("Counts: \n");
+  584|     11|  for (i = 0; i < NQ; i++) {
+  585|     10|    printf("%3d%15.0lf\n", i, q[i]);
+  586|     10|  }
+  587|       |
+  588|      1|  print_results("EP", CLASS, M + 1, 0, 0, nit, tm, Mops,
+  589|      1|                "Random numbers generated", verified, NPBVERSION, COMPILETIME,
+  590|      1|                CS1, CS2, CS3, CS4, CS5, CS6, CS7);
+  591|       |
+  592|      1|  if (timers_enabled) {
+  593|      0|    if (tm <= 0.0)
+  594|      0|      tm = 1.0;
+  595|      0|    tt = timer_read(0);
+  596|      0|    printf("\nTotal time:     %9.3lf (%6.2lf)\n", tt, tt * 100.0 / tm);
+  597|      0|    tt = timer_read(1);
+  598|      0|    printf("Gaussian pairs: %9.3lf (%6.2lf)\n", tt, tt * 100.0 / tm);
+  599|      0|    tt = timer_read(2);
+  600|      0|    printf("Random numbers: %9.3lf (%6.2lf)\n", tt, tt * 100.0 / tm);
+  601|      0|  }
+  602|       |
+  603|      1|  return 0;
+  604|      1|}
+  605|       |
+  606|     18|double randlc(double *x, double a) {
+  607|       |  //--------------------------------------------------------------------
+  608|       |  //
+  609|       |  //  This routine returns a uniform pseudorandom double precision number in the
+  610|       |  //  range (0, 1) by using the linear congruential generator
+  611|       |  //
+  612|       |  //  x_{k+1} = a x_k  (mod 2^46)
+  613|       |  //
+  614|       |  //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+  615|       |  //  before repeating.  The argument A is the same as 'a' in the above formula,
+  616|       |  //  and X is the same as x_0.  A and X must be odd double precision integers
+  617|       |  //  in the range (1, 2^46).  The returned value RANDLC is normalized to be
+  618|       |  //  between 0 and 1, i.e. RANDLC = 2^(-46) * x_1.  X is updated to contain
+  619|       |  //  the new seed x_1, so that subsequent calls to RANDLC using the same
+  620|       |  //  arguments will generate a continuous sequence.
+  621|       |  //
+  622|       |  //  This routine should produce the same results on any computer with at least
+  623|       |  //  48 mantissa bits in double precision floating point data.  On 64 bit
+  624|       |  //  systems, double precision should be disabled.
+  625|       |  //
+  626|       |  //  David H. Bailey     October 26, 1990
+  627|       |  //
+  628|       |  //--------------------------------------------------------------------
+  629|       |
+  630|       |  // r23 = pow(0.5, 23.0);
+  631|       |  ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+  632|       |  // r46 = r23 * r23;
+  633|       |  // t23 = pow(2.0, 23.0);
+  634|       |  ////  pow(2.0, 23.0) = 8.388608e+06
+  635|       |  // t46 = t23 * t23;
+  636|       |
+  637|     18|  const double r23 = 1.1920928955078125e-07;
+  638|     18|  const double r46 = r23 * r23;
+  639|     18|  const double t23 = 8.388608e+06;
+  640|     18|  const double t46 = t23 * t23;
+  641|       |
+  642|     18|  double t1, t2, t3, t4, a1, a2, x1, x2, z;
+  643|     18|  double r;
+  644|       |
+  645|       |  //--------------------------------------------------------------------
+  646|       |  //  Break A into two parts such that A = 2^23 * A1 + A2.
+  647|       |  //--------------------------------------------------------------------
+  648|     18|  t1 = r23 * a;
+  649|     18|  a1 = (int)t1;
+  650|     18|  a2 = a - t23 * a1;
+  651|       |
+  652|       |  //--------------------------------------------------------------------
+  653|       |  //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  654|       |  //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  655|       |  //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  656|       |  //--------------------------------------------------------------------
+  657|     18|  t1 = r23 * (*x);
+  658|     18|  x1 = (int)t1;
+  659|     18|  x2 = *x - t23 * x1;
+  660|     18|  t1 = a1 * x2 + a2 * x1;
+  661|     18|  t2 = (int)(r23 * t1);
+  662|     18|  z = t1 - t23 * t2;
+  663|     18|  t3 = t23 * z + a2 * x2;
+  664|     18|  t4 = (int)(r46 * t3);
+  665|     18|  *x = t3 - t46 * t4;
+  666|     18|  r = r46 * (*x);
+  667|       |
+  668|     18|  return r;
+  669|     18|}
+  670|       |
+  671|      2|void vranlc(int n, double *x, double a, double y[]) {
+  672|       |  //--------------------------------------------------------------------
+  673|       |  //
+  674|       |  //  This routine generates N uniform pseudorandom double precision numbers in
+  675|       |  //  the range (0, 1) by using the linear congruential generator
+  676|       |  //
+  677|       |  //  x_{k+1} = a x_k  (mod 2^46)
+  678|       |  //
+  679|       |  //  where 0 < x_k < 2^46 and 0 < a < 2^46.  This scheme generates 2^44 numbers
+  680|       |  //  before repeating.  The argument A is the same as 'a' in the above formula,
+  681|       |  //  and X is the same as x_0.  A and X must be odd double precision integers
+  682|       |  //  in the range (1, 2^46).  The N results are placed in Y and are normalized
+  683|       |  //  to be between 0 and 1.  X is updated to contain the new seed, so that
+  684|       |  //  subsequent calls to VRANLC using the same arguments will generate a
+  685|       |  //  continuous sequence.  If N is zero, only initialization is performed, and
+  686|       |  //  the variables X, A and Y are ignored.
+  687|       |  //
+  688|       |  //  This routine is the standard version designed for scalar or RISC systems.
+  689|       |  //  However, it should produce the same results on any single processor
+  690|       |  //  computer with at least 48 mantissa bits in double precision floating point
+  691|       |  //  data.  On 64 bit systems, double precision should be disabled.
+  692|       |  //
+  693|       |  //--------------------------------------------------------------------
+  694|       |
+  695|       |  // r23 = pow(0.5, 23.0);
+  696|       |  ////  pow(0.5, 23.0) = 1.1920928955078125e-07
+  697|       |  // r46 = r23 * r23;
+  698|       |  // t23 = pow(2.0, 23.0);
+  699|       |  ////  pow(2.0, 23.0) = 8.388608e+06
+  700|       |  // t46 = t23 * t23;
+  701|       |
+  702|      2|  const double r23 = 1.1920928955078125e-07;
+  703|      2|  const double r46 = r23 * r23;
+  704|      2|  const double t23 = 8.388608e+06;
+  705|      2|  const double t46 = t23 * t23;
+  706|       |
+  707|      2|  double t1, t2, t3, t4, a1, a2, x1, x2, z;
+  708|       |
+  709|      2|  int i;
+  710|       |
+  711|       |  //--------------------------------------------------------------------
+  712|       |  //  Break A into two parts such that A = 2^23 * A1 + A2.
+  713|       |  //--------------------------------------------------------------------
+  714|      2|  t1 = r23 * a;
+  715|      2|  a1 = (int)t1;
+  716|      2|  a2 = a - t23 * a1;
+  717|       |
+  718|       |  //--------------------------------------------------------------------
+  719|       |  //  Generate N results.   This loop is not vectorizable.
+  720|       |  //--------------------------------------------------------------------
+  721|      2|  for (i = 0; i < n; i++) {
+  722|       |    //--------------------------------------------------------------------
+  723|       |    //  Break X into two parts such that X = 2^23 * X1 + X2, compute
+  724|       |    //  Z = A1 * X2 + A2 * X1  (mod 2^23), and then
+  725|       |    //  X = 2^23 * Z + A2 * X2  (mod 2^46).
+  726|       |    //--------------------------------------------------------------------
+  727|      0|    t1 = r23 * (*x);
+  728|      0|    x1 = (int)t1;
+  729|      0|    x2 = *x - t23 * x1;
+  730|      0|    t1 = a1 * x2 + a2 * x1;
+  731|      0|    t2 = (int)(r23 * t1);
+  732|      0|    z = t1 - t23 * t2;
+  733|      0|    t3 = t23 * z + a2 * x2;
+  734|      0|    t4 = (int)(r46 * t3);
+  735|      0|    *x = t3 - t46 * t4;
+  736|      0|    y[i] = r46 * (*x);
+  737|      0|  }
+  738|       |
+  739|      2|  return;
+  740|      2|}
+  741|       |
+  742|       |/*  Prototype  */
+  743|       |void wtime(double *);
+  744|       |
+  745|       |/*****************************************************************/
+  746|       |/******         E  L  A  P  S  E  D  _  T  I  M  E          ******/
+  747|       |/*****************************************************************/
+  748|      2|static double elapsed_time(void) {
+  749|      2|  double t;
+  750|       |
+  751|      2|  wtime(&t);
+  752|      2|  return (t);
+  753|      2|}
+  754|       |
+  755|       |static double start[64], elapsed[64];
+  756|       |
+  757|       |/*****************************************************************/
+  758|       |/******            T  I  M  E  R  _  C  L  E  A  R          ******/
+  759|       |/*****************************************************************/
+  760|      3|void timer_clear(int n) { elapsed[n] = 0.0; }
+  761|       |
+  762|       |/*****************************************************************/
+  763|       |/******            T  I  M  E  R  _  S  T  A  R  T          ******/
+  764|       |/*****************************************************************/
+  765|      1|void timer_start(int n) { start[n] = elapsed_time(); }
+  766|       |
+  767|       |/*****************************************************************/
+  768|       |/******            T  I  M  E  R  _  S  T  O  P             ******/
+  769|       |/*****************************************************************/
+  770|      1|void timer_stop(int n) {
+  771|      1|  double t, now;
+  772|       |
+  773|      1|  now = elapsed_time();
+  774|      1|  t = now - start[n];
+  775|      1|  elapsed[n] += t;
+  776|      1|}
+  777|       |
+  778|       |/*****************************************************************/
+  779|       |/******            T  I  M  E  R  _  R  E  A  D             ******/
+  780|       |/*****************************************************************/
+  781|      1|double timer_read(int n) { return (elapsed[n]); }
+  782|       |
+  783|      2|void wtime(double *t) {
+  784|      2|  static int sec = -1;
+  785|      2|#ifndef _WIN32
+  786|      2|  struct timeval tv;
+  787|      2|  gettimeofday(&tv, (void *)0);
+  788|      2|  if (sec < 0)
+  789|      1|    sec = tv.tv_sec;
+  790|      2|  *t = (tv.tv_sec - sec) + 1.0e-6 * tv.tv_usec;
+  791|       |#else
+  792|       |  struct _timeb tv;
+  793|       |  _ftime(&tv);
+  794|       |  if (sec < 0)
+  795|       |    sec = tv.time;
+  796|       |  *t = (tv.time - sec) + 1.0e-3 * tv.millitm;
+  797|       |#endif
+  798|      2|}
+  799|       |
+  800|       |void print_results(char *name, char class, int n1, int n2, int n3, int niter,
+  801|       |                   double t, double mops, char *optype, logical verified,
+  802|       |                   char *npbversion, char *compiletime, char *cs1, char *cs2,
+  803|      1|                   char *cs3, char *cs4, char *cs5, char *cs6, char *cs7) {
+  804|      1|  char size[16];
+  805|      1|  int j;
+  806|       |
+  807|      1|  printf("\n\n %s Benchmark Completed.\n", name);
+  808|      1|  printf(" Class           =             %12c\n", class);
+  809|       |
+  810|       |  // If this is not a grid-based problem (EP, FT, CG), then
+  811|       |  // we only print n1, which contains some measure of the
+  812|       |  // problem size. In that case, n2 and n3 are both zero.
+  813|       |  // Otherwise, we print the grid size n1xn2xn3
+  814|       |
+  815|      1|  if ((n2 == 0) && (n3 == 0)) {
+  816|      1|    if ((name[0] == 'E') && (name[1] == 'P')) {
+  817|      1|      sprintf(size, "%15.0lf", pow(2.0, n1));
+  818|      1|      j = 14;
+  819|      1|      if (size[j] == '.') {
+  820|      0|        size[j] = ' ';
+  821|      0|        j--;
+  822|      0|      }
+  823|      1|      size[j + 1] = '\0';
+  824|      1|      printf(" Size            =          %15s\n", size);
+  825|      1|    } else {
+  826|      0|      printf(" Size            =             %12d\n", n1);
+  827|      0|    }
+  828|      1|  } else {
+  829|      0|    printf(" Size            =           %4dx%4dx%4d\n", n1, n2, n3);
+  830|      0|  }
+  831|       |
+  832|      1|  printf(" Iterations      =             %12d\n", niter);
+  833|      1|  printf(" Time in seconds =             %12.2lf\n", t);
+  834|      1|  printf(" Mop/s total     =          %15.2lf\n", mops);
+  835|      1|  printf(" Operation type  = %24s\n", optype);
+  836|      1|  if (verified)
+  837|      1|    printf(" Verification    =             %12s\n", "SUCCESSFUL");
+  838|      0|  else
+  839|      0|    printf(" Verification    =             %12s\n", "UNSUCCESSFUL");
+  840|      1|  printf(" Version         =             %12s\n", npbversion);
+  841|      1|  printf(" Compile date    =             %12s\n", compiletime);
+  842|       |
+  843|      1|  printf("\n Compile options:\n"
+  844|      1|         "    CC           = %s\n",
+  845|      1|         cs1);
+  846|      1|  printf("    CLINK        = %s\n", cs2);
+  847|      1|  printf("    C_LIB        = %s\n", cs3);
+  848|      1|  printf("    C_INC        = %s\n", cs4);
+  849|      1|  printf("    CFLAGS       = %s\n", cs5);
+  850|      1|  printf("    CLINKFLAGS   = %s\n", cs6);
+  851|      1|  printf("    RAND         = %s\n", cs7);
+  852|       |
+  853|      1|  printf("\n--------------------------------------\n"
+  854|      1|         " Please send all errors/feedbacks to:\n"
+  855|      1|         " Center for Manycore Programming\n"
+  856|      1|         " cmp@aces.snu.ac.kr\n"
+  857|      1|         " http://aces.snu.ac.kr\n"
+  858|      1|         "--------------------------------------\n\n");
+  859|      1|}
+
+/home/dvmuser3/andrey/npb-3.3-c/EP/npbparams.h:
+    1|       |/* CLASS = A */
+    2|       |/*
+    3|       |   This file is generated automatically by the setparams utility.
+    4|       |   It sets the number of processors and the class of the NPB
+    5|       |   in this directory. Do not modify it by hand.   
+    6|       |*/
+    7|      1|#define CLASS  'A'
+    8|      8|#define M      28
+    9|       |
+   10|       |#define CONVERTDOUBLE  false
+   11|      1|#define COMPILETIME "06 Apr 2024"
+   12|      1|#define NPBVERSION "3.3.1"
+   13|      1|#define CS1 "clang"
+   14|      1|#define CS2 "clang"
+   15|      1|#define CS3 "-lm"
+   16|      1|#define CS4 "-I ../common"
+   17|      1|#define CS5 "-c -g -O3 -fprofile-instr-generate -fcovera..."
+   18|      1|#define CS6 "-O3 -fprofile-instr-generate -fcoverage-map..."
+   19|      1|#define CS7 "randdp"
+
