@@ -1,0 +1,101 @@
+    1|       |/* ADI program */
+    2|       |
+    3|       |#include <math.h>
+    4|       |#include <stdlib.h>
+    5|       |#include <stdio.h>
+    6|       |
+    7|  5.57G|#define Max(a, b) ((a) > (b) ? (a) : (b))
+    8|       |
+    9|  56.8M|#define nx 384
+   10|   101M|#define ny 384
+   11|  16.8G|#define nz 384
+   12|       |
+   13|       |#pragma dvm inherit(a)
+   14|       |void init(double (*a)[ny][nz]);
+   15|       |
+   16|       |int main(int argc, char *argv[])
+   17|      1|{
+   18|      1|    double maxeps, eps;
+   19|      1|    #pragma dvm array distribute[block][block][block]
+   20|      1|    double (*a)[ny][nz];
+   21|      1|    int it, itmax, i, j, k;
+   22|      1|    double startt, endt;
+   23|      1|    maxeps = 0.01;
+   24|      1|    itmax = 100;
+   25|      1|    a = (double (*)[ny][nz])malloc(nx * ny * nz * sizeof(double));
+   26|      1|    init(a);
+   27|       |
+   28|       |#ifdef _DVMH
+   29|       |    dvmh_barrier();
+   30|       |    startt = dvmh_wtime();
+   31|       |#else
+   32|      1|    startt = 0;
+   33|      1|#endif
+   34|    101|    for (it = 1; it <= itmax; it++)
+   35|    100|    {
+   36|    100|        eps = 0;
+   37|    100|        #pragma dvm actual(eps)
+   38|    100|        #pragma dvm region
+   39|    100|        {
+   40|    100|        #pragma dvm parallel([i][j][k] on a[i][j][k]) across(a[1:1][0:0][0:0])
+   41|  38.3k|        for (i = 1; i < nx - 1; i++)
+   42|  14.6M|            for (j = 1; j < ny - 1; j++)
+   43|  5.58G|                for (k = 1; k < nz - 1; k++)
+   44|  5.57G|                    a[i][j][k] = (a[i-1][j][k] + a[i+1][j][k]) / 2;
+   45|    100|        #pragma dvm parallel([i][j][k] on a[i][j][k]) across(a[0:0][1:1][0:0])
+   46|  38.3k|        for (i = 1; i < nx - 1; i++)
+   47|  14.6M|            for (j = 1; j < ny - 1; j++)
+   48|  5.58G|                for (k = 1; k < nz - 1; k++)
+   49|  5.57G|                    a[i][j][k] = (a[i][j-1][k] + a[i][j+1][k]) / 2;
+   50|    100|        #pragma dvm parallel([i][j][k] on a[i][j][k]) across(a[0:0][0:0][1:1]), reduction(max(eps))
+   51|  38.3k|        for (i = 1; i < nx - 1; i++)
+   52|  14.6M|            for (j = 1; j < ny - 1; j++)
+   53|  5.58G|                for (k = 1; k < nz - 1; k++)
+   54|  5.57G|                {
+   55|  5.57G|                    double tmp1 = (a[i][j][k-1] + a[i][j][k+1]) / 2;
+   56|  5.57G|                    double tmp2 = fabs(a[i][j][k] - tmp1);
+   57|  5.57G|                    eps = Max(eps, tmp2);
+   58|  5.57G|                    a[i][j][k] = tmp1;
+   59|  5.57G|                }
+   60|    100|        }
+   61|    100|        #pragma dvm get_actual(eps)
+   62|    100|        printf(" IT = %4i   EPS = %14.7E\n", it, eps);
+   63|    100|        if (eps < maxeps)
+   64|      0|            break;
+   65|    100|    }
+   66|       |#ifdef _DVMH
+   67|       |    dvmh_barrier();
+   68|       |    endt = dvmh_wtime();
+   69|       |#else
+   70|      1|    endt = 0;
+   71|      1|#endif
+   72|      1|    free(a);
+   73|       |
+   74|      1|    printf(" ADI Benchmark Completed.\n");
+   75|      1|    printf(" Size            = %4d x %4d x %4d\n", nx, ny, nz);
+   76|      1|    printf(" Iterations      =       %12d\n", itmax);
+   77|      1|    printf(" Time in seconds =       %12.2lf\n", endt - startt);
+   78|      1|    printf(" Operation type  =   double precision\n");
+   79|      1|    printf(" Verification    =       %12s\n", (fabs(eps - 0.07249074) < 1e-6 ? "SUCCESSFUL" : "UNSUCCESSFUL"));
+   80|       |
+   81|      1|    printf(" END OF ADI Benchmark\n");
+   82|      1|    return 0;
+   83|      1|}
+   84|       |
+   85|       |#pragma dvm inherit(a)
+   86|       |void init(double (*a)[ny][nz])
+   87|      1|{
+   88|      1|    int i, j, k;
+   89|      1|    #pragma dvm region out(a)
+   90|      1|    {
+   91|      1|    #pragma dvm parallel([i][j][k] on a[i][j][k])
+   92|    385|    for (i = 0; i < nx; i++)
+   93|   147k|        for (j = 0; j < ny; j++)
+   94|  56.7M|            for (k = 0; k < nz; k++)
+   95|  56.6M|                if (k == 0 || k == nz - 1 || j == 0 || j == ny - 1 || i == 0 || i == nx - 1)
+   96|   880k|                    a[i][j][k] = 10.0 * i / (nx - 1) + 10.0 * j / (ny - 1) + 10.0 * k / (nz - 1);
+   97|  55.7M|                else
+   98|  55.7M|                    a[i][j][k] = 0;
+   99|      1|    }
+  100|      1|}
+
