@@ -1,0 +1,388 @@
+Processor system=1*2*2
+Statistics has been accumulated on DVM-system version 5.0, platform DVM
+Analyzer is executing on DVM-system version 5.0, platform DVM
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=100 SOURCE=lu.c ) LEVEL=0  EXE_COUNT=1
+--- The main characteristics --- 
+Parallelization efficiency      0.7111 
+Execution time                  7.9929 
+Processors                           4
+Threads amount                      16
+Total time                     31.9715
+Productive time                22.7353 ( CPU= 22.4096 Sys= 0.3257 I/O= 0.0000 )
+Lost  time                      9.2362 
+   Insufficient parallelism     1.9781 ( User= 1.0009 Sys= 0.9772 )
+   Communication                7.2556 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0025
+Load imbalance                  3.0575
+Synchronization                 3.2220
+Time variation                  0.7229
+Overlap                         0.0005
+                  Nop   Communic    Synchro  Variation    Overlap 
+Reduction          11     0.0197     0.0000     0.0000     0.0000 
+Shadow            770     7.2287     3.2220     0.7229     0.0005 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   1.5447     1     4.1391     4     2.3090 
+User insufficient par.      0.1853     4     0.2756     2     0.2502 
+Sys.insufficient par.       0.1895     4     0.2754     2     0.2443 
+Idle time                   0.0000     3     0.0011     2     0.0006 
+Communication               1.0279     1     3.7632     4     1.8139 
+Synchronization             0.0195     1     2.2123     4     0.8055 
+Variation                   0.0157     1     0.5532     4     0.1807 
+Overlap                     0.0000     4     0.0004     1     0.0001 
+Load imbalance              0.0000     1     2.5944     4     0.7644 
+Execution time              7.9918     2     7.9929     3     7.9922 
+User CPU time               3.7906     4     6.3660     1     5.6024 
+Sys. CPU time               0.0632     4     0.0918     2     0.0814 
+Processors                       4     1          4     4          4 
+                      Communic          Synchro        Variation          Overlap  
+Reduction       Tmin    0.0003     1     0.0000     2     0.0000     2     0.0000     1 
+Reduction       Tmax    0.0142     4     0.0000     4     0.0000     4     0.0000     4 
+Reduction       Tmid    0.0049           0.0000           0.0000           0.0000       
+Shadow          Tmin    1.0276     1     0.0195     1     0.0157     1     0.0000     4 
+Shadow          Tmax    3.7419     4     2.2123     4     0.5532     4     0.0004     1 
+Shadow          Tmid    1.8072           0.8055           0.1807           0.0001       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  1.5447     1.8259     1.7265     4.1391 
+User insufficient par.     0.2697     0.2756     0.2702     0.1853 
+Sys.insufficient par.      0.2467     0.2754     0.2657     0.1895 
+Idle time                  0.0004     0.0011     0.0000     0.0010 
+Communication              1.0279     1.2739     1.1906     3.7632 
+Synchronization            0.0195     0.4936     0.4967     2.2123 
+Variation                  0.0157     0.0662     0.0878     0.5532 
+Overlap                    0.0004     0.0001     0.0001     0.0000 
+Load imbalance             0.0000     0.2813     0.1818     2.5944 
+Execution time             7.9925     7.9918     7.9929     7.9918 
+User CPU time              6.3660     6.0751     6.1778     3.7906 
+Sys. CPU time              0.0822     0.0918     0.0886     0.0632 
+Processors                      4          4          4          4 
+           Communication          
+Reduction                  0.0003     0.0028     0.0024     0.0142 
+Shadow                     1.0276     1.2710     1.1882     3.7419 
+           Synchronization        
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+Shadow                     0.0195     0.4936     0.4967     2.2123 
+           Variation              
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+Shadow                     0.0157     0.0662     0.0877     0.5532 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+Shadow                     0.0004     0.0001     0.0001     0.0000 
+
+
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=42 SOURCE=rhs.c ) LEVEL=1 USER EXE_COUNT=2 EXPR=0
+--- The main characteristics --- 
+Parallelization efficiency      0.3515 
+Execution time                  0.0316 
+Processors                           4
+Threads amount                      16
+Total time                      0.1265
+Productive time                 0.0445 ( CPU= 0.0426 Sys= 0.0018 I/O= 0.0000 )
+Lost  time                      0.0820 
+   Insufficient parallelism     0.0094 ( User= 0.0039 Sys= 0.0055 )
+   Communication                0.0300 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0426
+Load imbalance                  0.0058
+Synchronization                 0.0337
+Time variation                  0.0050
+Overlap                         0.0000
+                  Nop   Communic    Synchro  Variation    Overlap 
+Shadow              6     0.0300     0.0337     0.0050     0.0000 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   0.0191     3     0.0240     4     0.0205 
+User insufficient par.      0.0008     4     0.0011     2     0.0010 
+Sys.insufficient par.       0.0013     1     0.0015     3     0.0014 
+Idle time                   0.0000     4     0.0167     1     0.0107 
+Communication               0.0004     1     0.0219     4     0.0075 
+Synchronization             0.0001     1     0.0256     4     0.0084 
+Variation                   0.0000     1     0.0039     4     0.0012 
+Overlap                     0.0000     2     0.0000     1     0.0000 
+Load imbalance              0.0000     3     0.0049     4     0.0014 
+Execution time              0.0149     1     0.0316     4     0.0210 
+User CPU time               0.0072     4     0.0121     3     0.0107 
+Sys. CPU time               0.0004     1     0.0005     3     0.0005 
+Processors                       4     1          4     4          4 
+                      Communic          Synchro        Variation          Overlap  
+Shadow          Tmin    0.0004     1     0.0001     1     0.0000     1     0.0000     2 
+Shadow          Tmax    0.0219     4     0.0256     4     0.0039     4     0.0000     1 
+Shadow          Tmid    0.0075           0.0084           0.0012           0.0000       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  0.0194     0.0196     0.0191     0.0240 
+User insufficient par.     0.0010     0.0011     0.0010     0.0008 
+Sys.insufficient par.      0.0013     0.0015     0.0015     0.0013 
+Idle time                  0.0167     0.0126     0.0133     0.0000 
+Communication              0.0004     0.0045     0.0032     0.0219 
+Synchronization            0.0001     0.0046     0.0035     0.0256 
+Variation                  0.0000     0.0005     0.0006     0.0039 
+Overlap                    0.0000     0.0000     0.0000     0.0000 
+Load imbalance             0.0004     0.0005     0.0000     0.0049 
+Execution time             0.0149     0.0191     0.0183     0.0316 
+User CPU time              0.0118     0.0116     0.0121     0.0072 
+Sys. CPU time              0.0004     0.0005     0.0005     0.0004 
+Processors                      4          4          4          4 
+           Communication          
+Shadow                     0.0004     0.0045     0.0032     0.0219 
+           Synchronization        
+Shadow                     0.0001     0.0046     0.0035     0.0256 
+           Variation              
+Shadow                     0.0000     0.0005     0.0006     0.0039 
+           Overlap                
+Shadow                     0.0000     0.0000     0.0000     0.0000 
+
+
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=49 SOURCE=l2norm.c ) LEVEL=1 USER EXE_COUNT=2 EXPR=0
+--- The main characteristics --- 
+Parallelization efficiency      0.0438 
+Execution time                  0.0045 
+Processors                           4
+Threads amount                      16
+Total time                      0.0181
+Productive time                 0.0008 ( CPU= 0.0008 Sys= 0.0000 I/O= 0.0000 )
+Lost  time                      0.0173 
+   Insufficient parallelism     0.0004 ( User= 0.0003 Sys= 0.0001 )
+   Communication                0.0049 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0120
+Load imbalance                  0.0001
+Overlap                         0.0000
+                  Nop   Communic    Overlap 
+Reduction           2     0.0049     0.0000 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   0.0043     2     0.0044     4     0.0043 
+User insufficient par.      0.0001     4     0.0001     1     0.0001 
+Sys.insufficient par.       0.0000     3     0.0000     4     0.0000 
+Idle time                   0.0000     4     0.0041     3     0.0030 
+Communication               0.0001     3     0.0043     4     0.0012 
+Overlap                     0.0000     1     0.0000     4     0.0000 
+Load imbalance              0.0000     2     0.0001     4     0.0000 
+Execution time              0.0004     3     0.0045     4     0.0015 
+User CPU time               0.0001     4     0.0002     2     0.0002 
+Sys. CPU time               0.0000     3     0.0000     4     0.0000 
+Processors                       4     1          4     4          4 
+                      Communic          Overlap  
+Reduction       Tmin    0.0001     3     0.0000     1 
+Reduction       Tmax    0.0043     4     0.0000     4 
+Reduction       Tmid    0.0012           0.0000       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  0.0043     0.0043     0.0043     0.0044 
+User insufficient par.     0.0001     0.0001     0.0001     0.0001 
+Sys.insufficient par.      0.0000     0.0000     0.0000     0.0000 
+Idle time                  0.0040     0.0038     0.0041     0.0000 
+Communication              0.0002     0.0004     0.0001     0.0043 
+Overlap                    0.0000     0.0000     0.0000     0.0000 
+Load imbalance             0.0000     0.0000     0.0000     0.0001 
+Execution time             0.0005     0.0008     0.0004     0.0045 
+User CPU time              0.0002     0.0002     0.0002     0.0001 
+Sys. CPU time              0.0000     0.0000     0.0000     0.0000 
+Processors                      4          4          4          4 
+           Communication          
+Reduction                  0.0002     0.0004     0.0001     0.0043 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+
+
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=97 SOURCE=ssor.c ) LEVEL=1 USER EXE_COUNT=2 EXPR=0
+--- The main characteristics --- 
+Parallelization efficiency      0.7101 
+Execution time                  7.8960 
+Processors                           4
+Threads amount                      16
+Total time                     31.5840
+Productive time                22.4269 ( CPU= 22.1052 Sys= 0.3218 I/O= 0.0000 )
+Lost  time                      9.1570 
+   Insufficient parallelism     1.9499 ( User= 0.9846 Sys= 0.9653 )
+   Communication                7.2047 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0024
+Load imbalance                  3.0139
+Synchronization                 3.1742
+Time variation                  0.7156
+Overlap                         0.0005
+                  Nop   Communic    Synchro  Variation    Overlap 
+Reduction           2     0.0123     0.0000     0.0000     0.0000 
+Shadow            757     7.1853     3.1742     0.7156     0.0005 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   1.5358     1     4.0967     4     2.2893 
+User insufficient par.      0.1817     4     0.2717     2     0.2461 
+Sys.insufficient par.       0.1869     4     0.2723     2     0.2413 
+Idle time                   0.0000     1     0.0021     4     0.0006 
+Communication               1.0266     1     3.7259     4     1.8012 
+Synchronization             0.0194     1     2.1760     4     0.7936 
+Variation                   0.0156     1     0.5478     4     0.1789 
+Overlap                     0.0000     4     0.0004     1     0.0001 
+Load imbalance              0.0000     1     2.5609     4     0.7535 
+Execution time              7.8939     4     7.8960     1     7.8954 
+User CPU time               3.7370     4     6.2790     1     5.5263 
+Sys. CPU time               0.0623     4     0.0908     2     0.0804 
+Processors                       4     1          4     4          4 
+                      Communic          Synchro        Variation          Overlap  
+Reduction       Tmin    0.0000     1     0.0000     4     0.0000     1     0.0000     1 
+Reduction       Tmax    0.0082     4     0.0000     3     0.0000     4     0.0000     4 
+Reduction       Tmid    0.0031           0.0000           0.0000           0.0000       
+Shadow          Tmin    1.0266     1     0.0194     1     0.0156     1     0.0000     4 
+Shadow          Tmax    3.7106     4     2.1760     4     0.5478     4     0.0003     1 
+Shadow          Tmid    1.7963           0.7936           0.1789           0.0001       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  1.5358     1.8117     1.7129     4.0967 
+User insufficient par.     0.2655     0.2717     0.2657     0.1817 
+Sys.insufficient par.      0.2437     0.2723     0.2624     0.1869 
+Idle time                  0.0000     0.0003     0.0000     0.0021 
+Communication              1.0266     1.2674     1.1848     3.7259 
+Synchronization            0.0194     0.4877     0.4911     2.1760 
+Variation                  0.0156     0.0652     0.0870     0.5478 
+Overlap                    0.0004     0.0001     0.0001     0.0000 
+Load imbalance             0.0000     0.2759     0.1771     2.5609 
+Execution time             7.8960     7.8957     7.8960     7.8939 
+User CPU time              6.2790     5.9935     6.0957     3.7370 
+Sys. CPU time              0.0812     0.0908     0.0875     0.0623 
+Processors                      4          4          4          4 
+           Communication          
+Reduction                  0.0000     0.0021     0.0020     0.0082 
+Shadow                     1.0266     1.2653     1.1828     3.7106 
+           Synchronization        
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+Shadow                     0.0194     0.4877     0.4911     2.1760 
+           Variation              
+Shadow                     0.0156     0.0652     0.0870     0.5478 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+Shadow                     0.0003     0.0001     0.0001     0.0000 
+
+
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=42 SOURCE=rhs.c ) LEVEL=2 USER EXE_COUNT=251 EXPR=0
+--- The main characteristics --- 
+Parallelization efficiency      0.4716 
+Execution time                  2.7533 
+Processors                           4
+Threads amount                      16
+Total time                     11.0130
+Productive time                 5.1933 ( CPU= 4.9853 Sys= 0.2080 I/O= 0.0000 )
+Lost  time                      5.8197 
+   Insufficient parallelism     1.1086 ( User= 0.4845 Sys= 0.6241 )
+   Communication                2.6358 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    2.0753
+Load imbalance                  0.8013
+Synchronization                 3.1500
+Time variation                  0.6647
+Overlap                         0.0003
+                  Nop   Communic    Synchro  Variation    Overlap 
+Shadow            753     2.6358     3.1500     0.6647     0.0003 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   1.2546     3     1.8817     4     1.4549 
+User insufficient par.      0.0928     4     0.1342     2     0.1211 
+Sys.insufficient par.       0.1287     4     0.1759     2     0.1560 
+Idle time                   0.0000     4     1.0308     1     0.5188 
+Communication               0.0556     1     1.6602     4     0.6589 
+Synchronization             0.0141     1     2.1687     4     0.7875 
+Variation                   0.0031     1     0.5350     4     0.1662 
+Overlap                     0.0000     4     0.0003     1     0.0001 
+Load imbalance              0.0000     3     0.6271     4     0.2003 
+Execution time              1.7224     1     2.7533     4     2.2344 
+User CPU time               0.8287     4     1.4420     3     1.2463 
+Sys. CPU time               0.0429     4     0.0586     2     0.0520 
+Processors                       4     1          4     4          4 
+                      Communic          Synchro        Variation          Overlap  
+Shadow          Tmin    0.0556     1     0.0141     1     0.0031     1     0.0000     4 
+Shadow          Tmax    1.6602     4     2.1687     4     0.5350     4     0.0003     1 
+Shadow          Tmid    0.6589           0.7875           0.1662           0.0001       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  1.3624     1.3210     1.2546     1.8817 
+User insufficient par.     0.1264     0.1342     0.1311     0.0928 
+Sys.insufficient par.      0.1497     0.1759     0.1699     0.1287 
+Idle time                  1.0308     0.5432     0.5013     0.0000 
+Communication              0.0556     0.4677     0.4523     1.6602 
+Synchronization            0.0141     0.4817     0.4855     2.1687 
+Variation                  0.0031     0.0521     0.0745     0.5350 
+Overlap                    0.0003     0.0001     0.0000     0.0000 
+Load imbalance             0.1078     0.0664     0.0000     0.6271 
+Execution time             1.7224     2.2101     2.2519     2.7533 
+User CPU time              1.3409     1.3736     1.4420     0.8287 
+Sys. CPU time              0.0499     0.0586     0.0566     0.0429 
+Processors                      4          4          4          4 
+           Communication          
+Shadow                     0.0556     0.4677     0.4523     1.6602 
+           Synchronization        
+Shadow                     0.0141     0.4817     0.4855     2.1687 
+           Variation              
+Shadow                     0.0031     0.0521     0.0745     0.5350 
+           Overlap                
+Shadow                     0.0003     0.0001     0.0000     0.0000 
+
+
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=49 SOURCE=l2norm.c ) LEVEL=2 USER EXE_COUNT=2 EXPR=0
+--- The main characteristics --- 
+Parallelization efficiency      0.0229 
+Execution time                  0.0084 
+Processors                           4
+Threads amount                      16
+Total time                      0.0338
+Productive time                 0.0008 ( CPU= 0.0007 Sys= 0.0000 I/O= 0.0000 )
+Lost  time                      0.0330 
+   Insufficient parallelism     0.0005 ( User= 0.0003 Sys= 0.0001 )
+   Communication                0.0123 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0202
+Load imbalance                  0.0001
+Synchronization                 0.0000
+Overlap                         0.0000
+                  Nop   Communic    Synchro    Overlap 
+Reduction           2     0.0123     0.0000     0.0000 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   0.0082     2     0.0083     4     0.0083 
+User insufficient par.      0.0001     4     0.0001     2     0.0001 
+Sys.insufficient par.       0.0000     4     0.0000     3     0.0000 
+Idle time                   0.0000     4     0.0081     1     0.0051 
+Communication               0.0000     1     0.0082     4     0.0031 
+Synchronization             0.0000     4     0.0000     3     0.0000 
+Overlap                     0.0000     1     0.0000     4     0.0000 
+Load imbalance              0.0000     2     0.0001     4     0.0000 
+Execution time              0.0004     1     0.0084     4     0.0034 
+User CPU time               0.0001     4     0.0002     2     0.0002 
+Sys. CPU time               0.0000     4     0.0000     3     0.0000 
+Processors                       4     1          4     4          4 
+                      Communic          Synchro          Overlap  
+Reduction       Tmin    0.0000     1     0.0000     4     0.0000     1 
+Reduction       Tmax    0.0082     4     0.0000     3     0.0000     4 
+Reduction       Tmid    0.0031           0.0000           0.0000       
+--- The execution characteristics --- 
+                                1          2          3          4 
+Lost time                  0.0082     0.0082     0.0082     0.0083 
+User insufficient par.     0.0001     0.0001     0.0001     0.0001 
+Sys.insufficient par.      0.0000     0.0000     0.0000     0.0000 
+Idle time                  0.0081     0.0060     0.0061     0.0000 
+Communication              0.0000     0.0021     0.0020     0.0082 
+Synchronization            0.0000     0.0000     0.0000     0.0000 
+Overlap                    0.0000     0.0000     0.0000     0.0000 
+Load imbalance             0.0000     0.0000     0.0000     0.0001 
+Execution time             0.0004     0.0024     0.0023     0.0084 
+User CPU time              0.0002     0.0002     0.0002     0.0001 
+Sys. CPU time              0.0000     0.0000     0.0000     0.0000 
+Processors                      4          4          4          4 
+           Communication          
+Reduction                  0.0000     0.0021     0.0020     0.0082 
+           Synchronization        
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0000     0.0000 
+
+
+-------------------------------------------------------------------------
+Name (number) and performance time of processors
+DVM(1) 0.517531
+DVM(2) 0.517467
+DVM(3) 0.517474
+DVM(4) 0.517766
+min - DVM(2) 0.517467; max - DVM(4) 0.517766; mid - 0.517559

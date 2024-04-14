@@ -1,0 +1,80 @@
+Processor system=3*1*1
+Statistics has been accumulated on DVM-system version 5.0, platform DVM
+Analyzer is executing on DVM-system version 5.0, platform DVM
+-------------------------------------------------------------------------
+INTERVAL ( NLINE=16 SOURCE=adi.c ) LEVEL=0  EXE_COUNT=1
+--- The main characteristics --- 
+Parallelization efficiency      0.8587 
+Execution time                 16.4221 
+Processors                           3
+Threads amount                      21
+Total time                     49.2662
+Productive time                42.3051 ( CPU= 42.0963 Sys= 0.2088 I/O= 0.0000 )
+Lost  time                      6.9611 
+   Insufficient parallelism     0.5464 ( User= 0.1288 Sys= 0.4176 )
+   Communication                6.4135 ( Real_sync= 0.0000 Starts= 0.0000 )
+   Idle time                    0.0012
+Load imbalance                  4.2382
+Synchronization                 9.9035
+Time variation                  9.9660
+Overlap                         0.0247
+                  Nop   Communic    Synchro  Variation    Overlap 
+Reduction         100     1.8583     0.0002     0.0002     0.0001 
+Shadow            703     4.5371     9.9033     9.9659     0.0246 
+--- The comparative characteristics --- 
+                              Tmin N proc      Tmax N proc      Tmid
+Lost time                   0.9076     1     3.9189     3     2.3204 
+User insufficient par.      0.0282     1     0.0553     3     0.0429 
+Sys.insufficient par.       0.1145     1     0.1714     2     0.1392 
+Idle time                   0.0000     3     0.0008     1     0.0004 
+Communication               0.7642     1     3.7318     3     2.1378 
+Synchronization             1.8175     2     4.3030     1     3.3012 
+Variation                   1.8394     2     4.2869     1     3.3220 
+Overlap                     0.0023     1     0.0142     3     0.0082 
+Load imbalance              0.0000     1     3.0112     3     1.4127 
+Execution time             16.4213     1    16.4221     3    16.4217 
+User CPU time              12.4373     3    15.4572     1    14.0321 
+Sys. CPU time               0.0573     1     0.0857     2     0.0696 
+Processors                       3     1          3     3          3 
+                      Communic          Synchro        Variation          Overlap  
+Reduction       Tmin    0.1940     2     0.0000     3     0.0000     3     0.0000     2 
+Reduction       Tmax    1.3445     3     0.0001     1     0.0001     1     0.0001     3 
+Reduction       Tmid    0.6194           0.0001           0.0001           0.0000       
+Shadow          Tmin    0.4443     1     1.8174     2     1.8393     2     0.0023     1 
+Shadow          Tmax    2.3873     3     4.3029     1     4.2869     1     0.0141     3 
+Shadow          Tmid    1.5124           3.3011           3.3220           0.0082       
+--- The execution characteristics --- 
+                                1          2          3 
+Lost time                  0.9076     2.1346     3.9189 
+User insufficient par.     0.0282     0.0454     0.0553 
+Sys.insufficient par.      0.1145     0.1714     0.1317 
+Idle time                  0.0008     0.0004     0.0000 
+Communication              0.7642     1.9175     3.7318 
+Synchronization            4.3030     1.8175     3.7830 
+Variation                  4.2869     1.8394     3.8397 
+Overlap                    0.0023     0.0083     0.0142 
+Load imbalance             0.0000     1.2269     3.0112 
+Execution time            16.4213    16.4217    16.4221 
+User CPU time             15.4572    14.2018    12.4373 
+Sys. CPU time              0.0573     0.0857     0.0659 
+Processors                      3          3          3 
+           Communication          
+Reduction                  0.3198     0.1940     1.3445 
+Shadow                     0.4443     1.7055     2.3873 
+           Synchronization        
+Reduction                  0.0001     0.0001     0.0000 
+Shadow                     4.3029     1.8174     3.7830 
+           Variation              
+Reduction                  0.0001     0.0001     0.0000 
+Shadow                     4.2869     1.8393     3.8397 
+           Overlap                
+Reduction                  0.0000     0.0000     0.0001 
+Shadow                     0.0023     0.0082     0.0141 
+
+
+-------------------------------------------------------------------------
+Name (number) and performance time of processors
+DVM(1) 0.539587
+DVM(2) 0.539539
+DVM(3) 0.539559
+min - DVM(2) 0.539539; max - DVM(1) 0.539587; mid - 0.539561
