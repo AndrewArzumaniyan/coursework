@@ -1,0 +1,102 @@
+    1|       |/* Jacobi-3 program */
+    2|       |
+    3|       |#include <math.h>
+    4|       |#include <stdio.h>
+    5|       |
+    6|  3.15G|#define Max(a, b) ((a) > (b) ? (a) : (b))
+    7|       |
+    8|  6.59G|#define L 400
+    9|     52|#define ITMAX 50
+   10|       |
+   11|       |int i, j, k, it;
+   12|       |double eps;
+   13|       |double MAXEPS = 0.5;
+   14|       |
+   15|       |/* 3D arrays block distributed along 3 dimensions */
+   16|       |#pragma dvm array distribute[][block][block]
+   17|       |double A[L][L][L];
+   18|       |#pragma dvm array align([i][j][k] with A[i][j][k])
+   19|       |double B[L][L][L];
+   20|       |
+   21|       |int main(int an, char **as)
+   22|      1|{
+   23|      1|    double startt, endt;
+   24|      1|    #pragma dvm region
+   25|      1|    {
+   26|       |    /* 3D parallel loop with base array A */
+   27|      1|    #pragma dvm parallel([i][j][k] on A[i][j][k]) cuda_block(32, 8)
+   28|    401|    for (i = 0; i < L; i++)
+   29|   160k|        for (j = 0; j < L; j++)
+   30|  64.1M|            for (k = 0; k < L; k++)
+   31|  64.0M|            {
+   32|  64.0M|                A[i][j][k] = 0;
+   33|  64.0M|                if (i == 0 || j == 0 || k == 0 || i == L - 1 || j == L - 1 || k == L - 1)
+   34|   955k|                    B[i][j][k] = 0;
+   35|  63.0M|                else
+   36|  63.0M|                    B[i][j][k] = 4 + i + j + k;
+   37|  64.0M|            }
+   38|      1|    }
+   39|       |
+   40|       |#ifdef _DVMH
+   41|       |    dvmh_barrier();
+   42|       |    startt = dvmh_wtime();
+   43|       |#else
+   44|      1|    startt = 0;
+   45|      1|#endif
+   46|       |    /* iteration loop */
+   47|     51|    for (it = 1; it <= ITMAX; it++)
+   48|     50|    {
+   49|     50|        eps = 0;
+   50|       |        //#pragma dvm actual(eps)
+   51|       |
+   52|       |        /* Parallel loop with base array A */
+   53|       |        /* calculating maximum in variable eps */        
+   54|  19.9k|        for (i = 1; i < L - 1; i++) {
+   55|  19.9k|            #pragma dvm region
+   56|  19.9k|            {
+   57|  19.9k|            #pragma dvm parallel([j][k] on A[][j][k]) reduction(max(eps))
+   58|  7.94M|            for (j = 1; j < L - 1; j++)
+   59|  3.16G|                for (k = 1; k < L - 1; k++)
+   60|  3.15G|                {
+   61|  3.15G|                    float tmp = fabs(B[i][j][k] - A[i][j][k]);
+   62|  3.15G|                    eps = Max(tmp, eps);
+   63|  3.15G|                    A[i][j][k] = B[i][j][k];
+   64|  3.15G|                }
+   65|  19.9k|            }
+   66|  19.9k|        }
+   67|       |        /* Parallel loop with base array B and */
+   68|       |        /* with prior updating shadow elements of array A */
+   69|       |        
+   70|  19.9k|        for (i = 1; i < L - 1; i++){
+   71|  19.9k|            #pragma dvm region
+   72|  19.9k|            { 
+   73|  19.9k|            #pragma dvm parallel([j][k] on B[][j][k]) shadow_renew(A)
+   74|  7.94M|            for (j = 1; j < L - 1; j++)
+   75|  3.16G|                for (k = 1; k < L - 1; k++)
+   76|  3.15G|                    B[i][j][k] = (A[i - 1][j][k] + A[i][j - 1][k] + A[i][j][k - 1] + A[i][j][k + 1] + A[i][j + 1][k] + A[i + 1][j][k]) / 6.0f;
+   77|  19.9k|            }
+   78|  19.9k|        }
+   79|       |
+   80|       |        //#pragma dvm get_actual(eps)
+   81|     50|        printf(" IT = %4i   EPS = %14.7E\n", it, eps);
+   82|     50|        if (eps < MAXEPS)
+   83|      0|            break;
+   84|     50|    }
+   85|       |#ifdef _DVMH
+   86|       |    dvmh_barrier();
+   87|       |    endt = dvmh_wtime();
+   88|       |#else
+   89|      1|    endt = 0;
+   90|      1|#endif
+   91|       |
+   92|      1|    printf(" Jacobi3D Benchmark Completed.\n");
+   93|      1|    printf(" Size            = %4d x %4d x %4d\n", L, L, L);
+   94|      1|    printf(" Iterations      =       %12d\n", ITMAX);
+   95|      1|    printf(" Time in seconds =       %12.2lf\n", endt - startt);
+   96|      1|    printf(" Operation type  =     floating point\n");
+   97|      1|    printf(" Verification    =       %12s\n", (fabs(eps - 5.058044) < 1e-4 ? "SUCCESSFUL" : "UNSUCCESSFUL"));
+   98|       |
+   99|      1|    printf(" END OF Jacobi3D Benchmark\n");
+  100|      1|    return 0;
+  101|      1|}
+
